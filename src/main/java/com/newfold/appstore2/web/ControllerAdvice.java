@@ -13,13 +13,13 @@ public class ControllerAdvice {
 
     @ExceptionHandler(value = OrderNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity orderNotFound(OrderNotFoundException e) {
+    public ResponseEntity<String> orderNotFound(OrderNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body( e.getMsg() );
     }
 
     @ExceptionHandler(value = ErrorCreatingOrderException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity errorCreating(ErrorCreatingOrderException e) {
+    public ResponseEntity<String> errorCreating(ErrorCreatingOrderException e) {
         return ResponseEntity.badRequest().body( e.getMsg() );
     }
 

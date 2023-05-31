@@ -6,5 +6,5 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class OrderNotFoundException extends RuntimeException {
-    String msg;
+    final String msg;
 }

@@ -11,6 +11,7 @@ import com.newfold.appstore2.exception.OrderNotFoundException;
 import com.newfold.appstore2.repositories.OrderRepository;
 import com.newfold.appstore2.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -44,11 +45,8 @@ public class StoreService {
                 .status(Order.Status.CREATED)
                 .orderLineList(orderLineList)
                 .build();
-        Order orderCreated = orderRepository.save(order);
-        if( null != orderCreated ){
-            return orderCreated.getId();
-        }
-        throw new ErrorCreatingOrderException("Error saving entity, request received " + orderDto);
+            Order orderCreated = orderRepository.save(order);
+        return orderCreated.getId();
     }
 
     private void addOrderLines(List<OrderLine> orderLineList, OrderLineDto orderLineDto) {
@@ -63,12 +61,12 @@ public class StoreService {
                             .quantity(orderLineDto.getQuantity())
                             .build());
         }
-        // ignore products with not matching id's
+        throw new ErrorCreatingOrderException("Error saving entity, product id not in stock, id: " + orderLineDto.getProductDto());
     }
 
     public List<ProductResponseDto> getProducts() {
         List<Product> productList = productRepository.findAll();
-        List<ProductResponseDto> productResponseDtoList = new ArrayList<ProductResponseDto>();
+        List<ProductResponseDto> productResponseDtoList = new ArrayList<>();
         productList.stream().forEach( product -> productResponseDtoList.add( ProductResponseDto.builder()
                 .description(product.getDescription())
                 .price(product.getPrice())

@@ -1,7 +1,6 @@
 package com.newfold.appstore2.web;
 
 import com.newfold.appstore2.dto.OrderDto;
-import com.newfold.appstore2.dto.ProductRequestDto;
 import com.newfold.appstore2.dto.ProductResponseDto;
 import com.newfold.appstore2.entities.Order;
 import com.newfold.appstore2.service.StoreService;
