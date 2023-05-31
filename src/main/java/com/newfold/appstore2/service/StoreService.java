@@ -11,7 +11,6 @@ import com.newfold.appstore2.exception.OrderNotFoundException;
 import com.newfold.appstore2.repositories.OrderRepository;
 import com.newfold.appstore2.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -41,7 +40,7 @@ public class StoreService {
         Order order = Order.builder()
                 .customerName(orderDto.getCustomerName())
                 .customerAddress(orderDto.getCustomerAddress())
-                .email(orderDto.getEmail())
+                .customerEmail(orderDto.getCustomerEmail())
                 .status(Order.Status.CREATED)
                 .orderLineList(orderLineList)
                 .build();
@@ -71,7 +70,37 @@ public class StoreService {
                 .description(product.getDescription())
                 .price(product.getPrice())
                 .id(product.getId())
+                .stock(product.getStock())
                 .build()));
         return productResponseDtoList;
+    }
+
+    public List<OrderDto> getAllOrders() {
+
+        List<Order> orderList = orderRepository.findAll();
+        OrderDto orderDto = OrderDto.builder().build();
+        List<OrderDto> orderDtoList = new ArrayList<>();
+        orderList.stream().forEach( order -> orderDtoList.add(orderDto.builder()
+                .id(order.getId())
+                .customerName(order.getCustomerName())
+                .customerAddress(order.getCustomerAddress())
+                .customerEmail(order.getCustomerEmail())
+                .orderLineDtoList(transform(order.getOrderLineList()))
+                .build())
+        );
+        return orderDtoList;
+    }
+
+    private List<OrderLineDto> transform(List<OrderLine> orderLineList) {
+        List<OrderLineDto> orderLineDtoList = new ArrayList<>();
+        orderLineList.stream().forEach( orderLine ->  orderLineDtoList.add(
+                                        OrderLineDto.builder()
+                                            .productDto(ProductResponseDto.builder()
+                                                    .id( orderLine.getProduct().getId() )
+                                                    .description( orderLine.getProduct().getDescription())
+                                                    .price( orderLine.getProduct().getPrice() ).build())
+                                                .build()
+                ));
+        return orderLineDtoList;
     }
 }

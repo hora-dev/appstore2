@@ -9,4 +9,5 @@ public class ProductResponseDto {
     Long id;
     String description;
     Double price;
+    Long stock;
 }

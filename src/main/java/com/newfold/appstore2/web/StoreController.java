@@ -31,4 +31,9 @@ public class StoreController {
     public ResponseEntity<List<ProductResponseDto>> getProducts() {
         return ResponseEntity.ok( storeService.getProducts());
     }
+
+    @GetMapping("orders")
+    public ResponseEntity<List<OrderDto>> getOrders() {
+        return ResponseEntity.ok( storeService.getAllOrders() );
+    }
 }

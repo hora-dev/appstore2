@@ -21,4 +21,5 @@ public class Product {
     Long id;
     String description;
     Double price;
+    Long stock;
 }

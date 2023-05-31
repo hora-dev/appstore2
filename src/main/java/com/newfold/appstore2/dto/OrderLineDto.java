@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @Builder
 public class OrderLineDto {
-    ProductRequestDto productDto;
+    ProductResponseDto productDto;
     long quantity;
 }
