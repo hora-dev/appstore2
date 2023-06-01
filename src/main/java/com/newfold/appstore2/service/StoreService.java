@@ -51,11 +51,16 @@ public class StoreService {
     private void addOrderLines(List<OrderLine> orderLineList, OrderLineDto orderLineDto) {
         Optional<Product> product = productRepository.findById(orderLineDto.getProductDto().getId());
         if(product.isPresent()) {
+            if( product.get().getStock() < orderLineDto.getQuantity()) {
+                throw new ErrorCreatingOrderException("Error creating order, product stock is " + product.get().getStock() +
+                        " and attempting to order : " + orderLineDto.getQuantity() + " products.");
+            }
             orderLineList.add(
                     OrderLine.builder()
                             .product(Product.builder()
                                     .description(product.get().getDescription())
                                     .price(product.get().getPrice())
+                                    .stock(product.get().getStock() - orderLineDto.getQuantity())
                                     .build() )
                             .quantity(orderLineDto.getQuantity())
                             .build());
@@ -78,9 +83,8 @@ public class StoreService {
     public List<OrderDto> getAllOrders() {
 
         List<Order> orderList = orderRepository.findAll();
-        OrderDto orderDto = OrderDto.builder().build();
         List<OrderDto> orderDtoList = new ArrayList<>();
-        orderList.stream().forEach( order -> orderDtoList.add(orderDto.builder()
+        orderList.stream().forEach( order -> orderDtoList.add(OrderDto.builder()
                 .id(order.getId())
                 .customerName(order.getCustomerName())
                 .customerAddress(order.getCustomerAddress())
