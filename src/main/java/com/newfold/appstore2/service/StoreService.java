@@ -2,6 +2,7 @@ package com.newfold.appstore2.service;
 
 import com.newfold.appstore2.dto.OrderDto;
 import com.newfold.appstore2.dto.OrderLineDto;
+import com.newfold.appstore2.dto.ProductOrderLineDto;
 import com.newfold.appstore2.dto.ProductResponseDto;
 import com.newfold.appstore2.entities.Order;
 import com.newfold.appstore2.entities.OrderLine;
@@ -99,10 +100,11 @@ public class StoreService {
         List<OrderLineDto> orderLineDtoList = new ArrayList<>();
         orderLineList.stream().forEach( orderLine ->  orderLineDtoList.add(
                                         OrderLineDto.builder()
-                                            .productDto(ProductResponseDto.builder()
+                                            .productDto(ProductOrderLineDto.builder()
                                                     .id( orderLine.getProduct().getId() )
                                                     .description( orderLine.getProduct().getDescription())
                                                     .price( orderLine.getProduct().getPrice() ).build())
+                                                .quantity(orderLine.getQuantity())
                                                 .build()
                 ));
         return orderLineDtoList;

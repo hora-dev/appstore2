@@ -5,7 +5,8 @@ import lombok.Data;
 
 @Data
 @Builder
-public class OrderLineDto {
-    ProductOrderLineDto productDto;
-    long quantity;
+public class ProductOrderLineDto {
+    Long id;
+    String description;
+    Double price;
 }
