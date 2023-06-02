@@ -9,6 +9,7 @@ import com.newfold.appstore2.entities.OrderLine;
 import com.newfold.appstore2.entities.Product;
 import com.newfold.appstore2.exception.ErrorCreatingOrderException;
 import com.newfold.appstore2.exception.OrderNotFoundException;
+import com.newfold.appstore2.repositories.OrderLineRepository;
 import com.newfold.appstore2.repositories.OrderRepository;
 import com.newfold.appstore2.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,8 @@ public class StoreService {
     OrderRepository orderRepository;
     @Autowired
     ProductRepository productRepository;
+    @Autowired
+    OrderLineRepository orderLineRepository;
 
     public Order.Status getOrderStatus(Long id) {
         Optional<Order> optionalOrder = orderRepository.findById(id);
@@ -35,38 +38,44 @@ public class StoreService {
     }
 
     public Long createOrder(OrderDto orderDto) {
-        List<OrderLine> orderLineList = new ArrayList<>();
-        orderDto.getOrderLineDtoList().stream().forEach(orderLineDto -> addOrderLines(orderLineList, orderLineDto));
 
         Order order = Order.builder()
                 .customerName(orderDto.getCustomerName())
                 .customerAddress(orderDto.getCustomerAddress())
                 .customerEmail(orderDto.getCustomerEmail())
                 .status(Order.Status.CREATED)
-                .orderLineList(orderLineList)
+                .orderLineList(new ArrayList<>())
                 .build();
             Order orderCreated = orderRepository.save(order);
+
+        List<OrderLine> orderLineList = new ArrayList<>();
+        orderDto.getOrderLineDtoList().stream().forEach(orderLineDto -> addOrderLines(orderLineList, orderLineDto, order));
+        order.setOrderLineList(orderLineList);
+        orderRepository.save(order);
+
         return orderCreated.getId();
     }
 
-    private void addOrderLines(List<OrderLine> orderLineList, OrderLineDto orderLineDto) {
-        Optional<Product> product = productRepository.findById(orderLineDto.getProductDto().getId());
-        if(product.isPresent()) {
-            if( product.get().getStock() < orderLineDto.getQuantity()) {
-                throw new ErrorCreatingOrderException("Error creating order, product stock is " + product.get().getStock() +
+    private void addOrderLines(List<OrderLine> orderLineList, OrderLineDto orderLineDto, Order order) {
+        Optional<Product> productOptional = productRepository.findById(orderLineDto.getProductDto().getId());
+        if(productOptional.isPresent()) {
+            if( productOptional.get().getStock() < orderLineDto.getQuantity()) {
+                throw new ErrorCreatingOrderException("Error creating order, productOptional stock is " + productOptional.get().getStock() +
                         " and attempting to order : " + orderLineDto.getQuantity() + " products.");
             }
-            orderLineList.add(
-                    OrderLine.builder()
-                            .product(Product.builder()
-                                    .description(product.get().getDescription())
-                                    .price(product.get().getPrice())
-                                    .stock(product.get().getStock() - orderLineDto.getQuantity())
-                                    .build() )
-                            .quantity(orderLineDto.getQuantity())
-                            .build());
+            productOptional.get().setStock(  productOptional.get().getStock() - orderLineDto.getQuantity());
+            productRepository.save(productOptional.get());
+            OrderLine orderLine = OrderLine.builder()
+                    .product( productOptional.get() )
+                    .quantity(orderLineDto.getQuantity())
+                    .order(order)
+                    .build();
+            orderLineRepository.save(orderLine);
+            orderLineList.add(orderLine);
+
+        } else {
+            throw new ErrorCreatingOrderException("Error saving entity, productOptional id not in stock, id: " + orderLineDto.getProductDto());
         }
-        throw new ErrorCreatingOrderException("Error saving entity, product id not in stock, id: " + orderLineDto.getProductDto());
     }
 
     public List<ProductResponseDto> getProducts() {

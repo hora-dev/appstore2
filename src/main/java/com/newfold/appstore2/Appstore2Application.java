@@ -36,7 +36,7 @@ public class Appstore2Application {
 		Product product1 = Product.builder().description("Tennis Racket")
 				.id(1L)
 				.price(120D)
-				.stock(1L)
+				.stock(32L)
 				.build();
 		Product product2 = Product.builder().description("Basket Ball")
 				.id(2L)
@@ -53,7 +53,7 @@ public class Appstore2Application {
 				.build();
 		orderLineRepository.save(orderLine);
 
-		product1.setStock(0L);
+		product1.setStock(31L);
 		productRepository.save(product1);
 
 
