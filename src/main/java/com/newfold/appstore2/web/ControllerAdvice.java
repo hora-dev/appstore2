@@ -2,6 +2,7 @@ package com.newfold.appstore2.web;
 
 import com.newfold.appstore2.exception.ErrorCreatingOrderException;
 import com.newfold.appstore2.exception.OrderNotFoundException;
+import com.newfold.appstore2.exception.OrderStatusException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,4 +24,9 @@ public class ControllerAdvice {
         return ResponseEntity.badRequest().body( e.getMsg() );
     }
 
+    @ExceptionHandler(value = OrderStatusException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<String> orderStatusExeption(OrderStatusException e) {
+        return ResponseEntity.badRequest().body( e.getMsg() );
+    }
 }

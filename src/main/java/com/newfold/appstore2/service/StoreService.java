@@ -9,6 +9,7 @@ import com.newfold.appstore2.entities.OrderLine;
 import com.newfold.appstore2.entities.Product;
 import com.newfold.appstore2.exception.ErrorCreatingOrderException;
 import com.newfold.appstore2.exception.OrderNotFoundException;
+import com.newfold.appstore2.exception.OrderStatusException;
 import com.newfold.appstore2.repositories.OrderLineRepository;
 import com.newfold.appstore2.repositories.OrderRepository;
 import com.newfold.appstore2.repositories.ProductRepository;
@@ -117,5 +118,21 @@ public class StoreService {
                                                 .build()
                 ));
         return orderLineDtoList;
+    }
+
+    public String cancelOrder(Long id) {
+        Optional<Order> optionalOrder = orderRepository.findById(id);
+        if(optionalOrder.isPresent()) {
+            Order order = optionalOrder.get();
+            if(!order.getStatus().equals(Order.Status.CANCELED) ) {
+                order.setStatus(Order.Status.CANCELED);
+                orderRepository.save(order);
+                return "Order status id: " + id + " is now cancelled";
+            } else {
+                throw new OrderStatusException("Order id: " + id + " status is already canceled");
+            }
+        } else {
+            throw new OrderNotFoundException("Order id: " + id + " not found");
+        }
     }
 }

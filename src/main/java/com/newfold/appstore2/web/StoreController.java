@@ -36,4 +36,10 @@ public class StoreController {
     public ResponseEntity<List<OrderDto>> getOrders() {
         return ResponseEntity.ok( storeService.getAllOrders() );
     }
+
+    @PostMapping("order/cancel/{id}")
+    public ResponseEntity<String> cancelOrder(@PathVariable Long id) {
+        return ResponseEntity.ok(storeService.cancelOrder(id));
+    }
+
 }
