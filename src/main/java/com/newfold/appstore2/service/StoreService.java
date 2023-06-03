@@ -1,9 +1,6 @@
 package com.newfold.appstore2.service;
 
-import com.newfold.appstore2.dto.OrderDto;
-import com.newfold.appstore2.dto.OrderLineDto;
-import com.newfold.appstore2.dto.ProductOrderLineDto;
-import com.newfold.appstore2.dto.ProductResponseDto;
+import com.newfold.appstore2.dto.*;
 import com.newfold.appstore2.entities.Order;
 import com.newfold.appstore2.entities.OrderLine;
 import com.newfold.appstore2.entities.Product;
@@ -38,19 +35,19 @@ public class StoreService {
         throw new OrderNotFoundException("Order not found");
     }
 
-    public Long createOrder(OrderDto orderDto) {
+    public Long createOrder(OrderRequestDto orderRequestDto) {
 
         Order order = Order.builder()
-                .customerName(orderDto.getCustomerName())
-                .customerAddress(orderDto.getCustomerAddress())
-                .customerEmail(orderDto.getCustomerEmail())
+                .customerName(orderRequestDto.getCustomerName())
+                .customerAddress(orderRequestDto.getCustomerAddress())
+                .customerEmail(orderRequestDto.getCustomerEmail())
                 .status(Order.Status.CREATED)
                 .orderLineList(new ArrayList<>())
                 .build();
             Order orderCreated = orderRepository.save(order);
 
         List<OrderLine> orderLineList = new ArrayList<>();
-        orderDto.getOrderLineDtoList().stream().forEach(orderLineDto -> addOrderLines(orderLineList, orderLineDto, order));
+        orderRequestDto.getOrderLineDtoList().stream().forEach(orderLineDto -> addOrderLines(orderLineList, orderLineDto, order));
         order.setOrderLineList(orderLineList);
         orderRepository.save(order);
 
@@ -101,6 +98,7 @@ public class StoreService {
                 .customerAddress(order.getCustomerAddress())
                 .customerEmail(order.getCustomerEmail())
                 .orderLineDtoList(transform(order.getOrderLineList()))
+                .status(order.getStatus().name())
                 .build())
         );
         return orderDtoList;

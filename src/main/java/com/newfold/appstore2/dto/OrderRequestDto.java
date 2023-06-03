@@ -7,11 +7,10 @@ import java.util.List;
 
 @Data
 @Builder
-public class OrderDto {
+public class OrderRequestDto {
     Long id;
     List<OrderLineDto> orderLineDtoList;
     String customerName;
     String customerAddress;
     String customerEmail;
-    String status;
 }

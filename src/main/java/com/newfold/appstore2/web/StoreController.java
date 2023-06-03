@@ -1,6 +1,7 @@
 package com.newfold.appstore2.web;
 
 import com.newfold.appstore2.dto.OrderDto;
+import com.newfold.appstore2.dto.OrderRequestDto;
 import com.newfold.appstore2.dto.ProductResponseDto;
 import com.newfold.appstore2.entities.Order;
 import com.newfold.appstore2.service.StoreService;
@@ -23,8 +24,8 @@ public class StoreController {
     }
 
     @PostMapping("order")
-    public ResponseEntity<Long> createOrder(@RequestBody OrderDto orderDto) {
-        return ResponseEntity.ok(storeService.createOrder(orderDto));
+    public ResponseEntity<Long> createOrder(@RequestBody OrderRequestDto orderRequestDto) {
+        return ResponseEntity.ok(storeService.createOrder(orderRequestDto));
     }
 
     @GetMapping("stock")
