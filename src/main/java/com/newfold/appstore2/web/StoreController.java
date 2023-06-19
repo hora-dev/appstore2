@@ -38,14 +38,18 @@ public class StoreController {
         return ResponseEntity.ok( storeService.getAllOrders() );
     }
 
+    @GetMapping("order/{id}")
+    public ResponseEntity<OrderDto> getOrder(@PathVariable Long id) {
+        return ResponseEntity.ok( storeService.getOrder(id) );
+    }
+
     @PostMapping("order/cancel/{id}")
     public ResponseEntity<String> cancelOrder(@PathVariable Long id) {
         return ResponseEntity.ok(storeService.cancelOrder(id));
     }
 
-    // TODO: update quantity order
     @PutMapping("order")
-    public ResponseEntity<Object> updateOrder(@RequestBody OrderRequestDto orderRequestDto) {
+    public ResponseEntity<OrderDto> updateOrder(@RequestBody OrderRequestDto orderRequestDto) {
         return ResponseEntity.ok(storeService.updateOrder(orderRequestDto));
     }
 

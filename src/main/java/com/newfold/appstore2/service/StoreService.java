@@ -47,7 +47,7 @@ public class StoreService {
             Order orderCreated = orderRepository.save(order);
 
         List<OrderLine> orderLineList = new ArrayList<>();
-        orderRequestDto.getOrderLineDtoList().stream().forEach(orderLineDto -> addOrderLines(orderLineList, orderLineDto, order));
+        orderRequestDto.getOrderLineDtoList().forEach(orderLineDto -> addOrderLines(orderLineList, orderLineDto, order));
         order.setOrderLineList(orderLineList);
         orderRepository.save(order);
 
@@ -58,7 +58,7 @@ public class StoreService {
         Optional<Product> productOptional = productRepository.findById(orderLineDto.getProductDto().getId());
         if(productOptional.isPresent()) {
             if( productOptional.get().getStock() < orderLineDto.getQuantity()) {
-                throw new ErrorCreatingOrderException("Error creating order, productOptional stock is " + productOptional.get().getStock() +
+                throw new ErrorCreatingOrderException("Error creating order, product stock is " + productOptional.get().getStock() +
                         " and attempting to order : " + orderLineDto.getQuantity() + " products.");
             }
             productOptional.get().setStock(  productOptional.get().getStock() - orderLineDto.getQuantity());
@@ -79,7 +79,7 @@ public class StoreService {
     public List<ProductResponseDto> getProducts() {
         List<Product> productList = productRepository.findAll();
         List<ProductResponseDto> productResponseDtoList = new ArrayList<>();
-        productList.stream().forEach( product -> productResponseDtoList.add( ProductResponseDto.builder()
+        productList.forEach( product -> productResponseDtoList.add( ProductResponseDto.builder()
                 .description(product.getDescription())
                 .price(product.getPrice())
                 .id(product.getId())
@@ -92,7 +92,7 @@ public class StoreService {
 
         List<Order> orderList = orderRepository.findAll();
         List<OrderDto> orderDtoList = new ArrayList<>();
-        orderList.stream().forEach( order -> orderDtoList.add(OrderDto.builder()
+        orderList.forEach( order -> orderDtoList.add(OrderDto.builder()
                 .id(order.getId())
                 .customerName(order.getCustomerName())
                 .customerAddress(order.getCustomerAddress())
@@ -106,7 +106,7 @@ public class StoreService {
 
     private List<OrderLineDto> transformOrderLineToOrderLineDto(List<OrderLine> orderLineList) {
         List<OrderLineDto> orderLineDtoList = new ArrayList<>();
-        orderLineList.stream().forEach( orderLine ->  orderLineDtoList.add(
+        orderLineList.forEach( orderLine ->  orderLineDtoList.add(
                                         OrderLineDto.builder()
                                             .productDto(ProductOrderLineDto.builder()
                                                     .id( orderLine.getProduct().getId() )
@@ -137,38 +137,75 @@ public class StoreService {
     }
 
     private void restoreProductsToStock(Order order) {
-        order.getOrderLineList().stream().forEach( orderLine ->
-                updateStock(orderLine.getProduct(), orderLine.getQuantity()));
+        order.getOrderLineList().forEach( orderLine ->
+                addStock(orderLine.getProduct(), orderLine.getQuantity()));
     }
 
-    private void updateStock(Product product, long quantity) {
+    private void addStock(Product product, long quantity) {
         product.setStock( product.getStock() + quantity );
+        productRepository.save(product);
     }
 
-
-    //TODO: update order
-    public Object updateOrder(OrderRequestDto orderRequestDto) {
+    public OrderDto updateOrder(OrderRequestDto orderRequestDto) {
         Optional<Order> optionalOrder = orderRepository.findById(orderRequestDto.getId());
         if(optionalOrder.isPresent()) {
             Order order = optionalOrder.get();
             List<OrderLineDto> changedOrderList = orderRequestDto.getOrderLineDtoList();
             if( null != changedOrderList && !changedOrderList.isEmpty()) {
-                changedOrderList.stream().forEach(orderLineDto -> {
-
-                });
+                changedOrderList.forEach(this::updateOrderLine);
             }
+            orderRepository.save(order);
+            return OrderDto.builder()
+                    .id(order.getId())
+                    .customerName(order.getCustomerName())
+                    .customerAddress(order.getCustomerAddress())
+                    .customerEmail(order.getCustomerEmail())
+                    .orderLineDtoList(transformOrderLineToOrderLineDto(order.getOrderLineList()))
+                    .status(order.getStatus().name())
+                    .build();
         } else {
             throw new OrderNotFoundException("Order id: " + orderRequestDto.getId() + " not found");
         }
-        return new Object();
     }
 
-    //TODO: update order line quantity
-    private OrderLine updateOrderLine(OrderLineDto orderLineDto) {
-        Optional<Product> optionalProduct = productRepository.findById(orderLineDto.getProductDto().getId());
-        if(optionalProduct.isPresent()) {
+    private void updateOrderLine(OrderLineDto orderLineDto) {
+        Optional<OrderLine> optionalOrderLine = orderLineRepository.findById(orderLineDto.getId());
+        if(optionalOrderLine.isPresent()) {
+            OrderLine orderLine = optionalOrderLine.get();
+            // check available stock before change order quantity
+            if(orderLine.getProduct().getStock() < orderLineDto.getQuantity())
+                throw new ErrorCreatingOrderException("Error updating order, product stock is " + orderLine.getProduct().getStock() +
+                        " and attempting to order : " + orderLineDto.getQuantity() + " products.");
 
+            if( orderLine.getQuantity() > orderLineDto.getQuantity()) {
+                subtractStock(orderLine.getProduct(), orderLineDto.getQuantity());
+            } else if (orderLine.getQuantity() < orderLineDto.getQuantity()) {
+                addStock(orderLine.getProduct(), orderLineDto.getQuantity());
+            }
+            orderLine.setQuantity( orderLineDto.getQuantity() );
+            orderLineRepository.save(orderLine);
         }
-        return new OrderLine();
+    }
+
+    private void subtractStock(Product product, long quantity) {
+        product.setStock( product.getStock() - quantity );
+        productRepository.save(product);
+    }
+
+    public OrderDto getOrder(long id) {
+        Optional<Order> optionalOrder = orderRepository.findById(id);
+        if(optionalOrder.isPresent()) {
+            Order order = optionalOrder.get();
+            return OrderDto.builder()
+                    .id(order.getId())
+                    .customerName(order.getCustomerName())
+                    .customerAddress(order.getCustomerAddress())
+                    .customerEmail(order.getCustomerEmail())
+                    .orderLineDtoList(transformOrderLineToOrderLineDto(order.getOrderLineList()))
+                    .status(order.getStatus().name())
+                    .build();
+        } else {
+            throw new OrderNotFoundException("Order id: " + id + " not found");
+        }
     }
 }
