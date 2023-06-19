@@ -33,6 +33,7 @@ public class Appstore2Application {
 
 	@PostConstruct
 	private void postConstruct() {
+		// set some initial stock
 		Product product1 = Product.builder().description("Tennis Racket")
 				.id(1L)
 				.price(120D)
@@ -46,6 +47,7 @@ public class Appstore2Application {
 		List<Product> productList = Arrays.asList(product1, product2);
 		productRepository.saveAll(productList);
 
+		// set first order
 		OrderLine orderLine = OrderLine.builder()
 				.id(1L)
 				.product(product1)
@@ -53,6 +55,7 @@ public class Appstore2Application {
 				.build();
 		orderLineRepository.save(orderLine);
 
+		// update stock
 		product1.setStock(31L);
 		productRepository.save(product1);
 

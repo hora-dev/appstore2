@@ -97,14 +97,14 @@ public class StoreService {
                 .customerName(order.getCustomerName())
                 .customerAddress(order.getCustomerAddress())
                 .customerEmail(order.getCustomerEmail())
-                .orderLineDtoList(transform(order.getOrderLineList()))
+                .orderLineDtoList(transformOrderLineToOrderLineDto(order.getOrderLineList()))
                 .status(order.getStatus().name())
                 .build())
         );
         return orderDtoList;
     }
 
-    private List<OrderLineDto> transform(List<OrderLine> orderLineList) {
+    private List<OrderLineDto> transformOrderLineToOrderLineDto(List<OrderLine> orderLineList) {
         List<OrderLineDto> orderLineDtoList = new ArrayList<>();
         orderLineList.stream().forEach( orderLine ->  orderLineDtoList.add(
                                         OrderLineDto.builder()
@@ -113,6 +113,7 @@ public class StoreService {
                                                     .description( orderLine.getProduct().getDescription())
                                                     .price( orderLine.getProduct().getPrice() ).build())
                                                 .quantity(orderLine.getQuantity())
+                                                .id(orderLine.getId())
                                                 .build()
                 ));
         return orderLineDtoList;
@@ -124,6 +125,7 @@ public class StoreService {
             Order order = optionalOrder.get();
             if(!order.getStatus().equals(Order.Status.CANCELED) ) {
                 order.setStatus(Order.Status.CANCELED);
+                restoreProductsToStock(order);
                 orderRepository.save(order);
                 return "Order status id: " + id + " is now cancelled";
             } else {
@@ -132,5 +134,41 @@ public class StoreService {
         } else {
             throw new OrderNotFoundException("Order id: " + id + " not found");
         }
+    }
+
+    private void restoreProductsToStock(Order order) {
+        order.getOrderLineList().stream().forEach( orderLine ->
+                updateStock(orderLine.getProduct(), orderLine.getQuantity()));
+    }
+
+    private void updateStock(Product product, long quantity) {
+        product.setStock( product.getStock() + quantity );
+    }
+
+
+    //TODO: update order
+    public Object updateOrder(OrderRequestDto orderRequestDto) {
+        Optional<Order> optionalOrder = orderRepository.findById(orderRequestDto.getId());
+        if(optionalOrder.isPresent()) {
+            Order order = optionalOrder.get();
+            List<OrderLineDto> changedOrderList = orderRequestDto.getOrderLineDtoList();
+            if( null != changedOrderList && !changedOrderList.isEmpty()) {
+                changedOrderList.stream().forEach(orderLineDto -> {
+
+                });
+            }
+        } else {
+            throw new OrderNotFoundException("Order id: " + orderRequestDto.getId() + " not found");
+        }
+        return new Object();
+    }
+
+    //TODO: update order line quantity
+    private OrderLine updateOrderLine(OrderLineDto orderLineDto) {
+        Optional<Product> optionalProduct = productRepository.findById(orderLineDto.getProductDto().getId());
+        if(optionalProduct.isPresent()) {
+
+        }
+        return new OrderLine();
     }
 }

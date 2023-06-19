@@ -43,4 +43,10 @@ public class StoreController {
         return ResponseEntity.ok(storeService.cancelOrder(id));
     }
 
+    // TODO: update quantity order
+    @PutMapping("order")
+    public ResponseEntity<Object> updateOrder(@RequestBody OrderRequestDto orderRequestDto) {
+        return ResponseEntity.ok(storeService.updateOrder(orderRequestDto));
+    }
+
 }
