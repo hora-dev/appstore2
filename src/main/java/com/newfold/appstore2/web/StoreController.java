@@ -5,6 +5,8 @@ import com.newfold.appstore2.dto.OrderRequestDto;
 import com.newfold.appstore2.dto.ProductResponseDto;
 import com.newfold.appstore2.entities.Order;
 import com.newfold.appstore2.service.StoreService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@ApiOperation("Store for NewFold")
 @RequestMapping("/store")
 public class StoreController {
 
@@ -33,6 +36,7 @@ public class StoreController {
         return ResponseEntity.ok( storeService.getProducts());
     }
 
+    @Operation(summary = "Get list of all orders")
     @GetMapping("orders")
     public ResponseEntity<List<OrderDto>> getOrders() {
         return ResponseEntity.ok( storeService.getAllOrders() );
