@@ -20,6 +20,8 @@ import java.util.Optional;
 @Service
 public class StoreService {
 
+    public static final String ORDER_ID = "Order id: ";
+    public static final String NOT_FOUND = " not found";
     @Autowired
     OrderRepository orderRepository;
     @Autowired
@@ -129,10 +131,10 @@ public class StoreService {
                 orderRepository.save(order);
                 return "Order status id: " + id + " is now cancelled";
             } else {
-                throw new OrderStatusException("Order id: " + id + " status is already canceled");
+                throw new OrderStatusException(ORDER_ID + id + " status is already canceled");
             }
         } else {
-            throw new OrderNotFoundException("Order id: " + id + " not found");
+            throw new OrderNotFoundException(ORDER_ID + id + NOT_FOUND);
         }
     }
 
@@ -164,7 +166,7 @@ public class StoreService {
                     .status(order.getStatus().name())
                     .build();
         } else {
-            throw new OrderNotFoundException("Order id: " + orderRequestDto.getId() + " not found");
+            throw new OrderNotFoundException(ORDER_ID + orderRequestDto.getId() + NOT_FOUND);
         }
     }
 
@@ -205,7 +207,7 @@ public class StoreService {
                     .status(order.getStatus().name())
                     .build();
         } else {
-            throw new OrderNotFoundException("Order id: " + id + " not found");
+            throw new OrderNotFoundException(ORDER_ID + id + NOT_FOUND);
         }
     }
 }

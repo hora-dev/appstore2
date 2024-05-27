@@ -9,7 +9,6 @@ import com.megawebs.appstore2.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ import java.util.Arrays;
 import java.util.List;
 
 @SpringBootApplication
-@EnableSwagger2
 public class Appstore2Application {
 
 	public static void main(String[] args) {
