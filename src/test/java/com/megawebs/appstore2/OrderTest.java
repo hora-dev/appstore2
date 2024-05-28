@@ -568,4 +568,47 @@ public class OrderTest {
         verify(orderRepository, times(1)).findById(orderId);
         verify(orderLineRepository, times(1)).findById(orderLineId);
     }
+
+    @Test
+    public void testUpdateOrderSubtractStock() {
+        // Arrange
+        Product product = Product.builder()
+                .id(1L)
+                .stock(10L)
+                .build();
+
+        OrderLine orderLine = OrderLine.builder()
+                .id(1L)
+                .product(product)
+                .quantity(5L)
+                .build();
+
+        Order order = Order.builder()
+                .id(1L)
+                .orderLineList(List.of(orderLine))
+                .status(Order.Status.CREATED)
+                .build();
+
+        OrderLineDto orderLineDto = OrderLineDto.builder()
+                .id(1L)
+                .quantity(3L) // Decrease quantity to trigger subtractStock indirectly
+                .build();
+
+        OrderRequestDto orderRequestDto = OrderRequestDto.builder()
+                .id(1L)
+                .orderLineDtoList(List.of(orderLineDto))
+                .build();
+
+        when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+        when(orderLineRepository.findById(1L)).thenReturn(Optional.of(orderLine));
+        when(productRepository.save(any(Product.class))).thenReturn(product);
+
+        // Act
+        storeService.updateOrder(orderRequestDto);
+
+        // Assert
+        assertEquals(7L, product.getStock(), "The stock should be reduced correctly");
+        verify(productRepository, times(1)).save(product);
+    }
+
 }
