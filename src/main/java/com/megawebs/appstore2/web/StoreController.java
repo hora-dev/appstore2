@@ -6,7 +6,7 @@ import com.megawebs.appstore2.dto.ProductResponseDto;
 import com.megawebs.appstore2.entities.Order;
 import com.megawebs.appstore2.service.StoreService;
 import io.swagger.v3.oas.annotations.Operation;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,10 +14,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/store")
+@RequiredArgsConstructor
 public class StoreController {
 
-    @Autowired
-    StoreService storeService;
+    final StoreService storeService;
 
     @GetMapping("order/status/{id}")
     public ResponseEntity<Order.Status> getOrderStatus(@PathVariable Long id) {

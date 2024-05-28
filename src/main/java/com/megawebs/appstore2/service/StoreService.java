@@ -1,6 +1,10 @@
 package com.megawebs.appstore2.service;
 
-import com.megawebs.appstore2.dto.*;
+import com.megawebs.appstore2.dto.OrderDto;
+import com.megawebs.appstore2.dto.OrderLineDto;
+import com.megawebs.appstore2.dto.OrderRequestDto;
+import com.megawebs.appstore2.dto.ProductOrderLineDto;
+import com.megawebs.appstore2.dto.ProductResponseDto;
 import com.megawebs.appstore2.entities.Order;
 import com.megawebs.appstore2.entities.OrderLine;
 import com.megawebs.appstore2.entities.Product;
@@ -10,7 +14,7 @@ import com.megawebs.appstore2.exception.OrderStatusException;
 import com.megawebs.appstore2.repositories.OrderLineRepository;
 import com.megawebs.appstore2.repositories.OrderRepository;
 import com.megawebs.appstore2.repositories.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,16 +22,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class StoreService {
 
     public static final String ORDER_ID = "Order id: ";
     public static final String NOT_FOUND = " not found";
-    @Autowired
-    OrderRepository orderRepository;
-    @Autowired
-    ProductRepository productRepository;
-    @Autowired
-    OrderLineRepository orderLineRepository;
+    final OrderRepository orderRepository;
+    final ProductRepository productRepository;
+    final OrderLineRepository orderLineRepository;
 
     public Order.Status getOrderStatus(Long id) {
         Optional<Order> optionalOrder = orderRepository.findById(id);

@@ -6,30 +6,28 @@ import com.megawebs.appstore2.entities.Product;
 import com.megawebs.appstore2.repositories.OrderLineRepository;
 import com.megawebs.appstore2.repositories.OrderRepository;
 import com.megawebs.appstore2.repositories.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 @SpringBootApplication
+@RequiredArgsConstructor
 public class Appstore2Application {
 
 	public static void main(String[] args) {
 		SpringApplication.run(Appstore2Application.class, args);
 	}
 
-	@Autowired
-	ProductRepository productRepository;
+	final ProductRepository productRepository;
 
-	@Autowired
-	OrderRepository orderRepository;
+	final OrderRepository orderRepository;
 
-	@Autowired
-	OrderLineRepository orderLineRepository;
+	final OrderLineRepository orderLineRepository;
 
 	@PostConstruct
 	private void postConstruct() {
