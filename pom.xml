@@ -7,11 +7,11 @@
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.2.1</version>
 	</parent>
-	<groupId>com.megawebs</groupId>
+	<groupId>com.onebit</groupId>
 	<artifactId>appstore2</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>appstore2</name>
-	<description>AppStore Demo for Newfold</description>
+	<description>AppStore Demo</description>
 	<properties>
 		<java.version>21</java.version>
 		<springdoc.version>2.3.0</springdoc.version>
@@ -89,12 +89,12 @@
 				</dependencies>
 				<configuration>
 					<excludes>
-						<exclude>com/megawebs/appstore2/configuration/**</exclude>
-						<exclude>com/megawebs/appstore2/web/**</exclude>
-						<exclude>com/megawebs/appstore2/exception/**</exclude>
-						<exclude>com/megawebs/appstore2/dto/**</exclude>
-						<exclude>com/megawebs/appstore2/entities/**</exclude>
-						<exclude>com/megawebs/appstore2/*.class</exclude>
+						<exclude>com/onebit/appstore2/configuration/**</exclude>
+						<exclude>com/onebit/appstore2/web/**</exclude>
+						<exclude>com/onebit/appstore2/exception/**</exclude>
+						<exclude>com/onebit/appstore2/dto/**</exclude>
+						<exclude>com/onebit/appstore2/entities/**</exclude>
+						<exclude>com/onebit/appstore2/*.class</exclude>
 					</excludes>
 					<rules>
 						<rule>
